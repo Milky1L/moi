@@ -20,6 +20,65 @@
   <!-- Background layers: an ink canvas that reacts to the mouse, and a soft light that follows it -->
   <canvas id="ink" aria-hidden="true"></canvas>
   <div id="glow" aria-hidden="true"></div>
+  <!-- Background scenes: one big faint drawing per stage (Read, Think, Write, Finish).
+       Only one shows at a time; main.js swaps them as you scroll, and styles.css
+       fades their edges so they melt into the dark background. -->
+  <div id="scenes" aria-hidden="true">
+    <!-- READ: an open book with two highlighted lines -->
+    <svg class="bg-scene" data-bg="0" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+      <path d="M600 250 C500 215 380 215 280 245 L280 600 C380 570 500 570 600 605 Z"/>
+      <path d="M600 250 C700 215 820 215 920 245 L920 600 C820 570 700 570 600 605 Z"/>
+      <g class="textlines">
+        <line x1="320" y1="300" x2="560" y2="300"/><line x1="320" y1="340" x2="540" y2="340"/><line x1="320" y1="380" x2="560" y2="380"/>
+        <line x1="320" y1="420" x2="500" y2="420"/><line x1="320" y1="460" x2="560" y2="460"/><line x1="320" y1="500" x2="530" y2="500"/>
+        <line x1="640" y1="300" x2="880" y2="300"/><line x1="640" y1="340" x2="860" y2="340"/><line x1="640" y1="380" x2="880" y2="380"/>
+        <line x1="640" y1="420" x2="820" y2="420"/><line x1="640" y1="460" x2="880" y2="460"/><line x1="640" y1="500" x2="850" y2="500"/>
+      </g>
+      <rect class="sweep" x="316" y="328" width="228" height="24" rx="6"/>
+      <rect class="sweep s2" x="636" y="448" width="248" height="24" rx="6"/>
+      <text class="quote" x="130" y="330">“</text><text class="quote q2" x="990" y="640">”</text>
+    </svg>
+    <!-- THINK: a web of linked ideas -->
+    <svg class="bg-scene" data-bg="1" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+      <g class="web">
+        <line x1="150" y1="180" x2="330" y2="120"/><line x1="330" y1="120" x2="520" y2="220"/><line x1="520" y1="220" x2="420" y2="400"/>
+        <line x1="420" y1="400" x2="230" y2="520"/><line x1="150" y1="180" x2="420" y2="400"/><line x1="420" y1="400" x2="640" y2="520"/>
+        <line x1="520" y1="220" x2="780" y2="330"/><line x1="780" y1="330" x2="930" y2="180"/><line x1="780" y1="330" x2="1050" y2="400"/>
+        <line x1="640" y1="520" x2="780" y2="330"/><line x1="640" y1="520" x2="880" y2="600"/><line x1="640" y1="520" x2="600" y2="680"/>
+        <line x1="880" y1="600" x2="1080" y2="650"/><line x1="1050" y1="400" x2="880" y2="600"/><line x1="230" y1="520" x2="600" y2="680"/>
+      </g>
+      <g class="dots">
+        <circle cx="150" cy="180" r="12"/><circle cx="330" cy="120" r="9"/><circle cx="520" cy="220" r="16"/><circle cx="420" cy="400" r="22"/>
+        <circle cx="230" cy="520" r="11"/><circle cx="640" cy="520" r="18"/><circle cx="780" cy="330" r="20"/><circle cx="930" cy="180" r="10"/>
+        <circle cx="1050" cy="400" r="14"/><circle cx="880" cy="600" r="12"/><circle cx="600" cy="680" r="9"/><circle cx="1080" cy="650" r="8"/>
+      </g>
+    </svg>
+    <!-- WRITE: lines of handwriting that draw themselves -->
+    <svg class="bg-scene" data-bg="2" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+      <g class="script">
+        <path pathLength="1" d="M180 220 q30 -50 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0"/>
+        <path pathLength="1" d="M180 330 q30 -50 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0"/>
+        <path pathLength="1" d="M180 440 q30 -50 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0"/>
+        <path pathLength="1" d="M180 550 q30 -50 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0"/>
+        <path pathLength="1" d="M180 660 q30 -50 60 0 t60 0 t60 0 t60 0 t60 0"/>
+      </g>
+      <line class="bigcaret" x1="520" y1="620" x2="520" y2="690"/>
+    </svg>
+    <!-- FINISH: a stack of pages with a tick, and rays behind it -->
+    <svg class="bg-scene" data-bg="3" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+      <g class="rays">
+        <line x1="600" y1="400" x2="600" y2="20"/><line x1="600" y1="400" x2="930" y2="70"/><line x1="600" y1="400" x2="1120" y2="400"/>
+        <line x1="600" y1="400" x2="930" y2="730"/><line x1="600" y1="400" x2="600" y2="780"/><line x1="600" y1="400" x2="270" y2="730"/>
+        <line x1="600" y1="400" x2="80" y2="400"/><line x1="600" y1="400" x2="270" y2="70"/>
+      </g>
+      <rect class="page" x="450" y="200" width="300" height="400" rx="10" transform="rotate(-9 600 400)"/>
+      <rect class="page" x="450" y="200" width="300" height="400" rx="10" transform="rotate(6 600 400)"/>
+      <rect class="page top" x="450" y="200" width="300" height="400" rx="10"/>
+      <line x1="490" y1="250" x2="640" y2="250"/><line x1="490" y1="290" x2="710" y2="290"/><line x1="490" y1="320" x2="700" y2="320"/>
+      <circle cx="600" cy="450" r="70"/>
+      <path class="tick" pathLength="1" d="M565 452 l26 28 l48 -58"/>
+    </svg>
+  </div>
 
   <header class="top">
     <a class="logo" href="#top" aria-label="MOI, back to top">MOI</a>
@@ -51,6 +110,8 @@
     <!-- STORY: pinned section whose scene changes as you scroll -->
     <section id="story" class="story" aria-labelledby="story-title">
       <div class="story-pin">
+        <!-- Giant see-through stage names that slide behind the story (decoration only) -->
+        <div class="ghosts" aria-hidden="true"><span class="ghost">Read</span><span class="ghost">Think</span><span class="ghost">Write</span><span class="ghost">Finish</span></div>
         <h2 id="story-title" class="eyebrow">One idea, four stages</h2>
         <div class="story-grid">
           <ol class="stages" aria-label="Stages">

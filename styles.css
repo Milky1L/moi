@@ -3,15 +3,21 @@
   index.html holds the content; this file colours and positions it;
   main.js adds the moving parts (it sets CSS "variables" like --mx that
   this file reads, which is how the mouse and scrolling change the look).
-  Idea: dark ink-black paper with warm amber light.
+  Idea: dark ink-black paper lit by one bright colour that changes with the
+  stage you are looking at (amber Read, violet Think, teal Write, rose Finish).
 */
+
+/* @property registers --accent as a real colour (not just loose text), so the
+   browser can mix it reliably. The fade between stage colours is done in main.js. */
+@property --accent { syntax: "<color>"; inherits: true; initial-value: #f2a950; }
 
 /* CSS variables: named values reused everywhere. Change one here, it changes everywhere. */
 :root {
   --bg: #14110f;
   --text: #f3ece0;      /* about 15:1 contrast on --bg, very readable */
   --muted: #bdb09c;     /* about 8:1 on --bg */
-  --accent: #f2a950;    /* amber, used for highlights */
+  --accent: #f2a950;    /* the bright colour; main.js swaps it per stage */
+  --px: 0; --py: 0;     /* mouse position from -0.5 to 0.5, used to slide the scenes */
   --accent-ink: #1a1208; /* dark text placed ON amber buttons */
   --line: rgba(243, 236, 224, 0.18);
   --card: rgba(243, 236, 224, 0.06);
@@ -42,9 +48,61 @@ code { background: var(--card); padding: .1em .35em; border-radius: 4px; }
 #glow {
   position: fixed; inset: 0; z-index: 1; pointer-events: none;
   /* a pool of warm light centred on the mouse */
-  background: radial-gradient(420px circle at var(--mx) var(--my), rgba(242,169,80,.16), transparent 70%);
+  /* color-mix blends the accent with see-through, giving a tinted light */
+  background: radial-gradient(620px circle at var(--mx) var(--my), color-mix(in srgb, var(--accent) 26%, transparent), transparent 70%);
 }
 main, header, footer { position: relative; z-index: 2; }
+
+/* BACKGROUND SCENES: four big line drawings stacked on top of each other.
+   The mask fades the edges to nothing so the drawing blends into the page.
+   Dim outside the story, full strength inside it (.in-story is set by main.js). */
+#scenes {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .5; transition: opacity .8s;
+  -webkit-mask-image: radial-gradient(ellipse 78% 72% at 58% 50%, #000 25%, transparent 78%);
+          mask-image: radial-gradient(ellipse 78% 72% at 58% 50%, #000 25%, transparent 78%);
+}
+.in-story #scenes { opacity: 1; }
+/* a soft wash of the stage colour behind the drawing */
+#scenes::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 55% at 60% 50%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 75%); }
+.bg-scene {
+  position: absolute; inset: -5%; width: 110%; height: 110%;
+  fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  opacity: 0; transition: opacity 1.1s, scale 1.4s cubic-bezier(.2,.8,.2,1);
+  scale: 1.12; /* hidden scenes wait slightly zoomed in, then settle when shown */
+  translate: calc(var(--px) * -40px) calc(var(--py) * -26px); /* slides against the mouse for depth */
+}
+.bg-scene.on { opacity: .34; scale: 1; }
+.bg-scene[data-bg="0"] { color: #f2a950; }
+.bg-scene[data-bg="1"] { color: #b39bff; }
+.bg-scene[data-bg="2"] { color: #5fe0c0; }
+.bg-scene[data-bg="3"] { color: #ff8fa3; }
+/* Read: highlighter bars wipe across two lines */
+.textlines { opacity: .6; }
+.sweep { fill: currentColor; stroke: none; opacity: .45; transform-box: fill-box; transform-origin: left; animation: sweep 5s ease-in-out infinite; }
+.sweep.s2 { animation-delay: 1.6s; }
+@keyframes sweep { 0%, 10% { transform: scaleX(0); } 45%, 85% { transform: scaleX(1); } 100% { transform: scaleX(1); opacity: 0; } }
+.quote { font: 220px Georgia, serif; fill: currentColor; stroke: none; opacity: .35; animation: floaty 7s ease-in-out infinite; }
+.quote.q2 { animation-delay: -3.5s; }
+@keyframes floaty { 50% { transform: translateY(-18px); } }
+/* Think: dots breathe, links shimmer */
+.web line { stroke-dasharray: 6 10; animation: crawl 3s linear infinite; }
+@keyframes crawl { to { stroke-dashoffset: -32; } }
+.dots circle { fill: currentColor; stroke: none; transform-box: fill-box; transform-origin: center; animation: breathe 3.2s ease-in-out infinite; }
+.dots circle:nth-child(3n) { animation-delay: -1s; } .dots circle:nth-child(3n+1) { animation-delay: -2s; }
+@keyframes breathe { 50% { transform: scale(1.5); opacity: .55; } }
+/* Write: each line of handwriting draws itself, one after another.
+   pathLength="1" in the HTML lets us treat every line as length 1, so a dash
+   of 1 hides or shows the whole line by sliding it. */
+.script path { stroke-width: 3; stroke-dasharray: 1; stroke-dashoffset: 1; animation: scribble 7s ease-in-out infinite; }
+.script path:nth-child(2) { animation-delay: .9s; } .script path:nth-child(3) { animation-delay: 1.8s; }
+.script path:nth-child(4) { animation-delay: 2.7s; } .script path:nth-child(5) { animation-delay: 3.6s; }
+@keyframes scribble { 0% { stroke-dashoffset: 1; } 35%, 88% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+.bigcaret { stroke-width: 5; animation: blink 1s steps(2) infinite; }
+/* Finish: rays turn slowly, the tick draws itself */
+.rays { transform-origin: 600px 400px; animation: spin 60s linear infinite; opacity: .5; stroke-dasharray: 2 16; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.page { fill: var(--bg); }
+.tick { stroke-width: 9; stroke-dasharray: 1; stroke-dashoffset: 1; animation: scribble 4s ease-in-out infinite; }
 
 /* Top bar */
 .top { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 14px 5vw; z-index: 10; background: linear-gradient(var(--bg), transparent); }
@@ -54,9 +112,11 @@ main, header, footer { position: relative; z-index: 2; }
 
 /* Buttons */
 .btn { display: inline-block; padding: .8em 1.5em; border: 1px solid var(--line); border-radius: 999px; color: var(--text); text-decoration: none; font-weight: 600; transition: transform .2s, background .2s; }
-.btn:hover { background: var(--card); transform: translateY(-2px); }
+.btn:hover { background: var(--card); }
+/* a coloured halo around the main buttons */
+.btn.primary, .btn.dl.mine { box-shadow: 0 0 34px color-mix(in srgb, var(--accent) 55%, transparent); }
 .btn.primary, .btn.dl.mine { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-.btn.primary:hover, .btn.dl.mine:hover { background: #ffc07a; }
+.btn.primary:hover, .btn.dl.mine:hover { background: var(--accent); filter: brightness(1.15); }
 .btn.dl { font-size: 1.15rem; padding: 1em 1.8em; }
 .btn.soon { opacity: .7; border-style: dashed; pointer-events: none; }
 .cta-row { display: flex; gap: 1rem; flex-wrap: wrap; }
@@ -66,7 +126,15 @@ main, header, footer { position: relative; z-index: 2; }
 .badge { align-self: flex-start; border: 1px solid var(--accent); color: var(--accent); padding: .3em .9em; border-radius: 999px; font-size: .85rem; letter-spacing: .06em; text-transform: uppercase; }
 .hero h1 { font-size: clamp(3.4rem, 13vw, 9rem); margin: .2em 0; letter-spacing: -.02em; }
 .hero h1 .line { display: block; will-change: transform; }
-.hero h1 .word { display: inline-block; animation: rise .9s cubic-bezier(.2,.8,.2,1) both; }
+/* The words are filled with a moving band of colour: the background is a gradient,
+   and background-clip: text cuts it to the letter shapes. */
+.hero h1 .word {
+  display: inline-block; animation: rise .9s cubic-bezier(.2,.8,.2,1) both, shine 6s linear infinite;
+  background: linear-gradient(100deg, var(--text) 35%, var(--accent) 50%, var(--text) 65%) 0 0 / 250% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero h1 .word.accent { background: none; color: var(--accent); text-shadow: 0 0 60px color-mix(in srgb, var(--accent) 60%, transparent); }
+@keyframes shine { from { background-position: 100% 0; } to { background-position: -150% 0; } }
 .hero h1 .line:nth-child(2) .word { animation-delay: .12s; }
 .hero h1 .line:nth-child(3) .word { animation-delay: .24s; }
 .hero h1 .line:nth-child(4) .word { animation-delay: .36s; }
@@ -83,18 +151,23 @@ main, header, footer { position: relative; z-index: 2; }
 .eyebrow { font: 600 .85rem var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.4rem; }
 .story-grid { flex: 1; display: grid; grid-template-columns: 160px 1fr 1.2fr; gap: 2rem; align-items: center; min-height: 0; }
 .stages { list-style: none; margin: 0; padding: 0; }
-.stages button { background: none; border: 0; color: var(--muted); font: 600 2rem var(--serif); padding: .2em 0; cursor: pointer; text-align: left; transition: color .3s, transform .3s; }
+.stages button { background: none; border: 0; color: var(--muted); font: 600 2rem var(--serif); padding: .2em 0; cursor: pointer; text-align: left; transition: transform .3s; /* no colour fade here: main.js already fades --accent */ }
 .stages button:hover { color: var(--text); }
 .stages button.on { color: var(--accent); transform: translateX(10px); }
 .stage-text { position: relative; min-height: 14em; }
 .copy { position: absolute; inset: 0; opacity: 0; transform: translateY(20px); transition: opacity .5s, transform .5s; pointer-events: none; }
 .copy.on { opacity: 1; transform: none; pointer-events: auto; }
 .copy h3 { font-size: 2.6rem; }
+/* Giant outlined stage names behind the story. Only the current one shows;
+   main.js slides it sideways as you scroll (--slide). */
+.ghosts { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: -1; }
+.ghost { position: absolute; left: 0; bottom: 4vh; font: 700 30vw/1 var(--serif); white-space: nowrap; color: transparent; -webkit-text-stroke: 2px var(--accent); opacity: 0; transition: opacity .6s; translate: calc(var(--slide, 0) * -30vw) 0; }
+.ghost.on { opacity: .13; }
 .progress { height: 3px; background: var(--line); margin-top: 1rem; }
-.progress span { display: block; height: 100%; width: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+.progress span { display: block; height: 100%; width: 100%; background: var(--accent); box-shadow: 0 0 14px var(--accent); transform: scaleX(0); transform-origin: left; }
 
 /* The little pretend app window: four scenes drawn from plain boxes */
-.window { background: #1f1a16; border: 1px solid var(--line); border-radius: 12px; aspect-ratio: 4 / 3; position: relative; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+.window { background: #1f1a16; border: 1px solid var(--line); border-radius: 12px; aspect-ratio: 4 / 3; position: relative; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 90px color-mix(in srgb, var(--accent) 30%, transparent); border-color: color-mix(in srgb, var(--accent) 50%, transparent); transition: transform .2s ease-out; }
 .window-bar { height: 28px; border-bottom: 1px solid var(--line); display: flex; gap: 6px; align-items: center; padding-left: 10px; }
 .window-bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
 .scene { position: absolute; inset: 28px 0 0; padding: 8% 10%; display: flex; flex-direction: column; justify-content: center; gap: 14px; opacity: 0; transition: opacity .5s; }
@@ -119,8 +192,8 @@ main, header, footer { position: relative; z-index: 2; }
 .cards, .help-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; margin-bottom: 1.2rem; }
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 1.6rem; transform-style: preserve-3d; transition: transform .15s ease-out, border-color .2s; position: relative; overflow: hidden; }
 /* a bright spot inside each card that follows the mouse (--cx/--cy set by main.js) */
-.card::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(220px circle at var(--cx, 50%) var(--cy, 0%), rgba(242,169,80,.18), transparent 70%); opacity: 0; transition: opacity .25s; }
-.card:hover { border-color: var(--accent); }
+.card::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(220px circle at var(--cx, 50%) var(--cy, 0%), color-mix(in srgb, var(--accent) 28%, transparent), transparent 70%); opacity: 0; transition: opacity .25s; }
+.card:hover { border-color: var(--accent); box-shadow: 0 18px 60px color-mix(in srgb, var(--accent) 22%, transparent); }
 .card:hover::before { opacity: 1; }
 .card h3 { font-size: 1.4rem; }
 .card ol { padding-left: 1.2em; margin: 0; } .card li { margin-bottom: .5em; }
@@ -145,6 +218,8 @@ footer { padding: 6vh 5vw 8vh; text-align: center; color: var(--muted); border-t
   .copy h3 { font-size: 1.8rem; }
   .window { max-height: 30vh; aspect-ratio: auto; height: 30vh; }
   #glow { display: none; }
+  .bg-scene.on { opacity: .24; } /* fainter on phones, where text sits right on top */
+  .ghost { bottom: auto; top: 10vh; }
 }
 
 /* "Reduce motion" setting: calm everything down, nothing slides or loops */

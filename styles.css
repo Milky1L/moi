@@ -1,0 +1,155 @@
+/*
+  styles.css: how the MOI website looks.
+  index.html holds the content; this file colours and positions it;
+  main.js adds the moving parts (it sets CSS "variables" like --mx that
+  this file reads, which is how the mouse and scrolling change the look).
+  Idea: dark ink-black paper with warm amber light.
+*/
+
+/* CSS variables: named values reused everywhere. Change one here, it changes everywhere. */
+:root {
+  --bg: #14110f;
+  --text: #f3ece0;      /* about 15:1 contrast on --bg, very readable */
+  --muted: #bdb09c;     /* about 8:1 on --bg */
+  --accent: #f2a950;    /* amber, used for highlights */
+  --accent-ink: #1a1208; /* dark text placed ON amber buttons */
+  --line: rgba(243, 236, 224, 0.18);
+  --card: rgba(243, 236, 224, 0.06);
+  --mx: 50vw; --my: 40vh; /* mouse position, updated by main.js */
+  --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 1.05rem/1.6 var(--sans); overflow-x: hidden;
+}
+h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.1; margin: 0 0 .5em; }
+p { margin: 0 0 1em; }
+a { color: var(--accent); }
+code { background: var(--card); padding: .1em .35em; border-radius: 4px; }
+.muted { color: var(--muted); }
+
+/* Keyboard users: a clear ring on whatever has focus */
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.skip { position: absolute; left: 8px; top: -60px; background: var(--accent); color: var(--accent-ink); padding: .6em 1em; z-index: 100; border-radius: 6px; }
+.skip:focus { top: 8px; }
+
+/* Background layers sit behind everything (z-index below content) */
+#ink { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
+#glow {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  /* a pool of warm light centred on the mouse */
+  background: radial-gradient(420px circle at var(--mx) var(--my), rgba(242,169,80,.16), transparent 70%);
+}
+main, header, footer { position: relative; z-index: 2; }
+
+/* Top bar */
+.top { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 14px 5vw; z-index: 10; background: linear-gradient(var(--bg), transparent); }
+.logo { font: 700 1.5rem var(--serif); letter-spacing: .12em; text-decoration: none; color: var(--text); }
+.top nav a { color: var(--text); text-decoration: none; margin-left: 1.4rem; font-size: .95rem; }
+.top nav a:hover { color: var(--accent); }
+
+/* Buttons */
+.btn { display: inline-block; padding: .8em 1.5em; border: 1px solid var(--line); border-radius: 999px; color: var(--text); text-decoration: none; font-weight: 600; transition: transform .2s, background .2s; }
+.btn:hover { background: var(--card); transform: translateY(-2px); }
+.btn.primary, .btn.dl.mine { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.primary:hover, .btn.dl.mine:hover { background: #ffc07a; }
+.btn.dl { font-size: 1.15rem; padding: 1em 1.8em; }
+.btn.soon { opacity: .7; border-style: dashed; pointer-events: none; }
+.cta-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+/* HERO */
+.hero { min-height: 100vh; padding: 14vh 5vw 8vh; display: flex; flex-direction: column; justify-content: center; max-width: 1100px; margin: 0 auto; }
+.badge { align-self: flex-start; border: 1px solid var(--accent); color: var(--accent); padding: .3em .9em; border-radius: 999px; font-size: .85rem; letter-spacing: .06em; text-transform: uppercase; }
+.hero h1 { font-size: clamp(3.4rem, 13vw, 9rem); margin: .2em 0; letter-spacing: -.02em; }
+.hero h1 .line { display: block; will-change: transform; }
+.hero h1 .word { display: inline-block; animation: rise .9s cubic-bezier(.2,.8,.2,1) both; }
+.hero h1 .line:nth-child(2) .word { animation-delay: .12s; }
+.hero h1 .line:nth-child(3) .word { animation-delay: .24s; }
+.hero h1 .line:nth-child(4) .word { animation-delay: .36s; }
+.accent { color: var(--accent); font-style: italic; }
+@keyframes rise { from { opacity: 0; transform: translateY(40px) rotate(2deg); } }
+.lede { font-size: 1.3rem; max-width: 36em; color: var(--muted); }
+.lede em { color: var(--text); }
+.scroll-hint { color: var(--muted); margin-top: 2rem; animation: bob 2s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(8px); } }
+
+/* STORY: tall section; the inner part sticks to the screen while you scroll through it */
+.story { height: 420vh; position: relative; }
+.story-pin { position: sticky; top: 0; height: 100vh; padding: 12vh 5vw 4vh; max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; }
+.eyebrow { font: 600 .85rem var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.4rem; }
+.story-grid { flex: 1; display: grid; grid-template-columns: 160px 1fr 1.2fr; gap: 2rem; align-items: center; min-height: 0; }
+.stages { list-style: none; margin: 0; padding: 0; }
+.stages button { background: none; border: 0; color: var(--muted); font: 600 2rem var(--serif); padding: .2em 0; cursor: pointer; text-align: left; transition: color .3s, transform .3s; }
+.stages button:hover { color: var(--text); }
+.stages button.on { color: var(--accent); transform: translateX(10px); }
+.stage-text { position: relative; min-height: 14em; }
+.copy { position: absolute; inset: 0; opacity: 0; transform: translateY(20px); transition: opacity .5s, transform .5s; pointer-events: none; }
+.copy.on { opacity: 1; transform: none; pointer-events: auto; }
+.copy h3 { font-size: 2.6rem; }
+.progress { height: 3px; background: var(--line); margin-top: 1rem; }
+.progress span { display: block; height: 100%; width: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+
+/* The little pretend app window: four scenes drawn from plain boxes */
+.window { background: #1f1a16; border: 1px solid var(--line); border-radius: 12px; aspect-ratio: 4 / 3; position: relative; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+.window-bar { height: 28px; border-bottom: 1px solid var(--line); display: flex; gap: 6px; align-items: center; padding-left: 10px; }
+.window-bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
+.scene { position: absolute; inset: 28px 0 0; padding: 8% 10%; display: flex; flex-direction: column; justify-content: center; gap: 14px; opacity: 0; transition: opacity .5s; }
+.scene.on { opacity: 1; }
+.ln { display: block; height: 10px; border-radius: 5px; background: rgba(243,236,224,.28); }
+.ln.title { height: 16px; background: rgba(243,236,224,.6); }
+.ln.hl { background: var(--accent); }
+.ln.hl2 { background: #8fc7a5; }
+.caret { position: relative; }
+.caret::after { content: ""; position: absolute; right: -8px; top: -4px; width: 3px; height: 18px; background: var(--accent); animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.w95{width:95%}.w90{width:90%}.w85{width:85%}.w80{width:80%}.w70{width:70%}.w60{width:60%}.w50{width:50%}.w40{width:40%}
+.scene svg { width: 100%; height: 100%; }
+.links line { stroke: rgba(243,236,224,.35); stroke-width: 1.5; }
+.nodes circle { fill: var(--accent); }
+.paper { background: #f3ece0; border-radius: 4px; padding: 8% 10%; display: flex; flex-direction: column; gap: 12px; width: 70%; margin: 0 auto; aspect-ratio: 3/4; position: relative; }
+.paper .ln { background: rgba(20,17,15,.35); } .paper .ln.title { background: rgba(20,17,15,.8); }
+.paper em { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; color: #14110f; font-size: .8rem; }
+
+/* Sections after the story */
+.principles, .download, .help { max-width: 1100px; margin: 0 auto; padding: 14vh 5vw 6vh; }
+.cards, .help-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; margin-bottom: 1.2rem; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 1.6rem; transform-style: preserve-3d; transition: transform .15s ease-out, border-color .2s; position: relative; overflow: hidden; }
+/* a bright spot inside each card that follows the mouse (--cx/--cy set by main.js) */
+.card::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(220px circle at var(--cx, 50%) var(--cy, 0%), rgba(242,169,80,.18), transparent 70%); opacity: 0; transition: opacity .25s; }
+.card:hover { border-color: var(--accent); }
+.card:hover::before { opacity: 1; }
+.card h3 { font-size: 1.4rem; }
+.card ol { padding-left: 1.2em; margin: 0; } .card li { margin-bottom: .5em; }
+.big { font-size: 1.5rem; }
+.dl-buttons { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0 2rem; }
+.download ul { padding-left: 1.2em; }
+footer { padding: 6vh 5vw 8vh; text-align: center; color: var(--muted); border-top: 1px solid var(--line); margin-top: 8vh; background: var(--bg); }
+
+/* Reveal on scroll: starts faded and lowered, main.js adds .in when it enters the screen.
+   Only applies when JavaScript is running (.js class), so no-JS visitors still see everything. */
+.js .reveal { opacity: 0; transform: translateY(36px); transition: opacity .8s, transform .8s; }
+.js .reveal.in { opacity: 1; transform: none; }
+
+/* Phones: stack the story, lighter effects */
+@media (max-width: 800px) {
+  .top nav a:first-child { display: none; }
+  .story-grid { grid-template-columns: 1fr; gap: 1rem; align-content: center; }
+  .stages { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .stages button { font-size: 1.3rem; }
+  .stages button.on { transform: none; }
+  .stage-text { min-height: 11em; }
+  .copy h3 { font-size: 1.8rem; }
+  .window { max-height: 30vh; aspect-ratio: auto; height: 30vh; }
+  #glow { display: none; }
+}
+
+/* "Reduce motion" setting: calm everything down, nothing slides or loops */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition-duration: .01s !important; }
+  .js .reveal { opacity: 1; transform: none; }
+}

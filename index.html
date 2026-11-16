@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<!--
+  index.html: the one and only page of the MOI download website.
+  It holds the words and the structure. styles.css makes it look good,
+  main.js makes it react to the mouse and to scrolling, and downloads.json
+  says which version people can download. Nothing here needs the internet
+  or a build step: double-click this file and it works.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MOI: a writing app for readers and thinkers</title>
+  <meta name="description" content="MOI is a desktop writing app where you read, think, write and finish in one place. Early test version for Mac and Windows.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#download">Skip to download</a>
+
+  <!-- Background layers: an ink canvas that reacts to the mouse, and a soft light that follows it -->
+  <canvas id="ink" aria-hidden="true"></canvas>
+  <div id="glow" aria-hidden="true"></div>
+
+  <header class="top">
+    <a class="logo" href="#top" aria-label="MOI, back to top">MOI</a>
+    <nav aria-label="Main">
+      <a href="#story">The idea</a>
+      <a href="#download">Download</a>
+      <a href="#help">Install help</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <p class="badge">Early test version · for friends</p>
+      <h1 aria-label="Marketplace of ideas">
+        <span class="line" data-depth="0.04"><span class="word">Read.</span></span>
+        <span class="line" data-depth="0.08"><span class="word">Think.</span></span>
+        <span class="line" data-depth="0.12"><span class="word">Write.</span></span>
+        <span class="line" data-depth="0.16"><span class="word accent">Finish.</span></span>
+      </h1>
+      <p class="lede">MOI, the <em>Marketplace Of Ideas</em>, is a writing app for people who read and think for a living or for love. One window takes an idea from source, to note, to finished paper.</p>
+      <p class="cta-row">
+        <a class="btn primary" href="#download">Get the test version</a>
+        <a class="btn" href="#story">See how it works</a>
+      </p>
+      <p class="scroll-hint" aria-hidden="true">scroll ↓</p>
+    </section>
+
+    <!-- STORY: pinned section whose scene changes as you scroll -->
+    <section id="story" class="story" aria-labelledby="story-title">
+      <div class="story-pin">
+        <h2 id="story-title" class="eyebrow">One idea, four stages</h2>
+        <div class="story-grid">
+          <ol class="stages" aria-label="Stages">
+            <li><button type="button" data-stage="0">Read</button></li>
+            <li><button type="button" data-stage="1">Think</button></li>
+            <li><button type="button" data-stage="2">Write</button></li>
+            <li><button type="button" data-stage="3">Finish</button></li>
+          </ol>
+
+          <div class="stage-text" aria-live="polite">
+            <div class="copy" data-copy="0"><h3>Read</h3><p>Mark up what you read. Highlights can carry a meaning, so a quote you want later is easy to find again.</p></div>
+            <div class="copy" data-copy="1"><h3>Think</h3><p>Link notes to each other with <code>[[double brackets]]</code>. Your ideas form a web you can walk through, not a pile you dig in.</p></div>
+            <div class="copy" data-copy="2"><h3>Write</h3><p>Draft in a calm editor with tables, pictures and maths. Notes are plain Markdown, so other apps can open them too.</p></div>
+            <div class="copy" data-copy="3"><h3>Finish</h3><p>Lay the paper out for handing in, and download it as Word or PDF. Google Docs can open the Word file.</p></div>
+          </div>
+
+          <div class="window" aria-hidden="true">
+            <div class="window-bar"><i></i><i></i><i></i></div>
+            <div class="scene" data-scene="0">
+              <span class="ln w90"></span><span class="ln w80 hl"></span><span class="ln w95"></span>
+              <span class="ln w60 hl2"></span><span class="ln w85"></span><span class="ln w70"></span>
+            </div>
+            <div class="scene" data-scene="1">
+              <svg viewBox="0 0 300 200">
+                <g class="links"><line x1="60" y1="50" x2="150" y2="110"/><line x1="150" y1="110" x2="245" y2="45"/><line x1="150" y1="110" x2="90" y2="165"/><line x1="150" y1="110" x2="240" y2="160"/></g>
+                <g class="nodes"><circle cx="60" cy="50" r="12"/><circle cx="150" cy="110" r="18"/><circle cx="245" cy="45" r="10"/><circle cx="90" cy="165" r="9"/><circle cx="240" cy="160" r="13"/></g>
+              </svg>
+            </div>
+            <div class="scene" data-scene="2">
+              <span class="ln w50 title"></span>
+              <span class="ln w95"></span><span class="ln w90"></span><span class="ln w40 caret"></span>
+            </div>
+            <div class="scene" data-scene="3">
+              <div class="paper"><span class="ln w60 title"></span><span class="ln w95"></span><span class="ln w90"></span><span class="ln w95"></span><span class="ln w70"></span><em>1</em></div>
+            </div>
+          </div>
+        </div>
+        <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+      </div>
+    </section>
+
+    <!-- PRINCIPLES: cards that tilt toward the mouse -->
+    <section class="principles" aria-labelledby="p-title">
+      <h2 id="p-title" class="eyebrow reveal">What MOI promises</h2>
+      <div class="cards">
+        <article class="card reveal"><h3>Your files stay yours</h3><p>Notes are plain Markdown files in a folder you choose. If you stop using MOI, they are still just text.</p></article>
+        <article class="card reveal"><h3>No chatbot</h3><p>MOI does not write for you and has no AI assistant. The thinking is yours.</p></article>
+        <article class="card reveal"><h3>Mac and Windows</h3><p>The same app on both. This early version is for friends who will tell us what is confusing.</p></article>
+        <article class="card reveal"><h3>Made to be tested</h3><p>It is unfinished on purpose. Try it and say what felt wrong.</p></article>
+      </div>
+    </section>
+
+    <!-- DOWNLOAD -->
+    <section id="download" class="download" aria-labelledby="d-title">
+      <h2 id="d-title" class="eyebrow reveal">Download</h2>
+      <p class="reveal big">Latest test version: <strong id="dl-version">…</strong> <span id="dl-date" class="muted"></span></p>
+      <p id="dl-detected" class="muted reveal" role="status"></p>
+      <div class="dl-buttons reveal">
+        <a id="dl-mac" class="btn dl" href="#download">Download for Mac</a>
+        <a id="dl-win" class="btn dl" href="#download">Download for Windows</a>
+      </div>
+      <h3 class="reveal">What is in this version</h3>
+      <ul id="dl-notes" class="reveal"></ul>
+      <p class="muted reveal">This is an early test version. It may have bugs, so keep a copy of anything important.</p>
+    </section>
+
+    <!-- INSTALL HELP -->
+    <section id="help" class="help" aria-labelledby="h-title">
+      <h2 id="h-title" class="eyebrow reveal">Install help</h2>
+      <p class="reveal">MOI is not signed with a paid developer certificate yet, so your computer will warn you the first time. That is expected. Here is how to get past it.</p>
+      <div class="help-grid">
+        <article class="card reveal" id="help-mac">
+          <h3>On a Mac</h3>
+          <ol>
+            <li>Open the downloaded file and drag MOI into Applications.</li>
+            <li>Open MOI. macOS will say it cannot verify it. Click <b>Done</b>.</li>
+            <li>Open <b>System Settings &gt; Privacy &amp; Security</b>, scroll down, and click <b>Open Anyway</b> next to MOI.</li>
+            <li>Confirm. After that it opens normally.</li>
+          </ol>
+        </article>
+        <article class="card reveal" id="help-win">
+          <h3>On Windows</h3>
+          <ol>
+            <li>Run the downloaded installer.</li>
+            <li>If a blue “Windows protected your PC” box appears, click <b>More info</b>.</li>
+            <li>Click <b>Run anyway</b>.</li>
+            <li>Follow the installer. After that it opens normally.</li>
+          </ol>
+        </article>
+      </div>
+      <div class="help-grid">
+        <article class="card reveal"><h3>Uninstall</h3><p><b>Mac:</b> drag MOI from Applications to the Trash. <b>Windows:</b> Settings &gt; Apps, find MOI, choose Uninstall.</p></article>
+        <article class="card reveal"><h3>Your notes</h3><p>Uninstalling MOI does not delete your notes. They live in your own folder, as plain Markdown files, and stay there.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>MOI · Marketplace Of Ideas · early test version</p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

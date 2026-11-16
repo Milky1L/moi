@@ -1,0 +1,12 @@
+{
+  "_note": "Edit this file to publish a new version. Leave a url as \"\" and its button says 'Coming soon'. The URLs below are PLACEHOLDERS, not real files yet.",
+  "version": "0.1.0-test",
+  "date": "2026-11-16",
+  "mac": "",
+  "windows": "",
+  "notes": [
+    "Early test version for friends. Expect rough edges.",
+    "Read, Think, Write and Finish in one window.",
+    "Your notes are plain Markdown files in a folder you choose."
+  ]
+}

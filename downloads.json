@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "date": "2026-11-19",
   "mac": "https://github.com/Milky1L/moi/releases/download/v0.2.0/MOI-0.2.0-mac-apple-silicon.dmg",
-  "windows": "",
+  "windows": "https://github.com/Milky1L/moi/releases/download/v0.2.0/MOI-0.2.0-windows-setup.exe",
   "notes": [
     "Open, read and highlight PDFs, and quotes that cite themselves.",
     "Scanned PDFs become selectable text, offline.",
@@ -25,7 +25,8 @@
         "Footnotes, notes and comments on plain pages",
         "A new default look matching the website, with a sparkle trail you can turn off",
         "A clearer sign of which stage you're in",
-        "A notice when a newer version is out"
+        "A notice when a newer version is out",
+        "Windows: the 0.2.0 installer was built on a Mac and has not been tested on a Windows PC yet; please report anything that does not work"
       ],
       "fixed": [
         "Scanned PDFs from some scanners showed blank pages",

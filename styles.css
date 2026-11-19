@@ -208,6 +208,15 @@ footer { padding: 6vh 5vw 8vh; text-align: center; color: var(--muted); border-t
 .js .reveal.in { opacity: 1; transform: none; }
 
 /* Phones: stack the story, lighter effects */
+/* Version history: one collapsible box per version, using the page's own colour variables
+   so it reads well wherever those change. */
+.history details { border: 1px solid var(--line); background: var(--card); border-radius: 12px; padding: .7em 1em; margin: 0 0 .8em; max-width: 46rem; }
+.history summary { cursor: pointer; font-weight: 600; color: var(--text); }
+.history h4 { margin: 1em 0 .3em; color: var(--accent); font-size: .85rem; letter-spacing: .06em; text-transform: uppercase; }
+.history ul { margin: 0; padding-left: 1.2em; }
+.history li { margin: .2em 0; overflow-wrap: anywhere; }
+.history p { margin: 0; }
+
 @media (max-width: 800px) {
   .top nav a:first-child { display: none; }
   .story-grid { grid-template-columns: 1fr; gap: 1rem; align-content: center; }

@@ -280,8 +280,32 @@
   // ---------- 6. Download section ----------
   // A copy of downloads.json used when the page is opened straight from a file
   // (browsers block reading other files that way). Keep it in step with downloads.json.
-  var FALLBACK = { version: "0.1.0-test", date: "2026-11-16", mac: "", windows: "",
-    notes: ["Early test version for friends. Expect rough edges.", "Read, Think, Write and Finish in one window.", "Your notes are plain Markdown files in a folder you choose."] };
+  var FALLBACK = {"version": "0.2.0", "date": "2026-11-19", "mac": "https://github.com/Milky1L/moi/releases/download/v0.2.0/MOI-0.2.0-mac-apple-silicon.dmg", "windows": "", "notes": ["Open, read and highlight PDFs, and quotes that cite themselves.", "Scanned PDFs become selectable text, offline.", "A new look, one New button, and a notice when a newer version is out."], "history": [{"version": "0.2.0", "date": "2026-11-19", "new": ["Open, read and highlight PDFs (highlights are kept beside the PDF, which is never changed)", "Open a PDF from Finder or Explorer (right-click › Open With › MOI)", "One highlight across two pages, and linking highlights into one quote", "Quotes cite themselves in your chosen style (Chicago, APA, MLA, APSA) with one-click copy, including books with chapters by different authors", "Link a highlight colour to a heading, so quotes are added there automatically", "\"Read this scan\": scanned PDFs become selectable text, offline", "On a Mac it also reads handwriting with Apple's built-in reader, and words it's unsure of are marked; on Windows handwriting reads only roughly", "One New button: Pageless or Pages", "Footnotes, notes and comments on plain pages", "A new default look matching the website, with a sparkle trail you can turn off", "A clearer sign of which stage you're in", "A notice when a newer version is out"], "fixed": ["Scanned PDFs from some scanners showed blank pages", "PDF pages after the first five weren't checked for scans"], "removed": []}, {"version": "0.1.0", "date": "2026-11-17", "new": ["Early test version for friends. Expect rough edges.", "Read, Think, Write and Finish in one window.", "Your notes are plain Markdown files in a folder you choose."], "fixed": [], "removed": []}]};
+
+  // Draws the version history: one collapsible box per version, newest first and open, each
+  // with New / Fixed / Removed lists. Hand it: the "history" list from downloads.json.
+  // Text is added with textContent (never innerHTML) so nothing in the file can run as code.
+  function showHistory(history) {
+    var box = document.getElementById("dl-history");
+    if (!box) return;
+    box.innerHTML = "";
+    history.forEach(function (v, i) {
+      var det = document.createElement("details");
+      if (i === 0) det.open = true;
+      var sum = document.createElement("summary");
+      sum.textContent = "Version " + v.version + " (" + v.date + ")";
+      det.appendChild(sum);
+      [["New", v["new"]], ["Fixed", v.fixed], ["Removed", v.removed]].forEach(function (part) {
+        var h = document.createElement("h4"); h.textContent = part[0]; det.appendChild(h);
+        var items = part[1] || [];
+        if (!items.length) { var p = document.createElement("p"); p.className = "muted"; p.textContent = "Nothing"; det.appendChild(p); return; }
+        var ul = document.createElement("ul");
+        items.forEach(function (t) { var li = document.createElement("li"); li.textContent = t; ul.appendChild(li); });
+        det.appendChild(ul);
+      });
+      box.appendChild(det);
+    });
+  }
 
   // Fills in the version, notes and the two buttons
   function showDownloads(d) {
@@ -290,6 +314,8 @@
     var ul = document.getElementById("dl-notes");
     ul.innerHTML = "";
     (d.notes || []).forEach(function (n) { var li = document.createElement("li"); li.textContent = n; ul.appendChild(li); });
+
+    showHistory(d.history || []);
 
     var ua = navigator.userAgent;
     var os = /Windows/i.test(ua) ? "win" : /iPhone|iPad|Android/i.test(ua) ? "mobile" : /Mac/i.test(ua) ? "mac" : "other";
